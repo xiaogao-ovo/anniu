@@ -1,177 +1,150 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
-
-    <head>
-
-        <meta charset="UTF-8">
-
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <title>诡异按钮</title>
-
-        <link rel="stylesheet" href="https://fonts.bunny.net/css?family=londrina-solid:400">
-
-        <style>
-
-            * { border: 0; box-sizing: border-box; margin: 0; padding: 0; } :root { --hue: 223deg; --gray1: hsl(var(--hue) 10%95%); --gray9: hsl(var(--hue) 10%15%); --black: hsl(00%0%); --primary3: hsl(var(--hue) 90%75%); --primary5: hsl(var(--hue) 90%55%); --primary6: hsl(var(--hue) 90%45%); --trans-dur: 0.3s; color-scheme: light dark; font-size: clamp(1.25rem, 1rem + 1.25vw, 2.5rem); } body, button { font: 1em / 1.5"Londrina Solid", sans-serif; transition: background-color var(--trans-dur), color var(--trans-dur); } body { background-color: light-dark(var(--gray1), var(--gray9)); color: light-dark(var(--gray9), var(--gray1)); display: grid; place-items: center; height: 100vh; } .creepy-btn { background-color: var(--black); border-radius: 1.25em; color: var(--gray1); cursor: pointer; letter-spacing: 1px; min-width: 9em; outline: 0.1875em solid transparent; transition: outline 0.1s linear; -webkit-tap-highlight-color: transparent; } .creepy-btn, .creepy-btn__cover, .creepy-btn__eye { position: relative; } .creepy-btn, .creepy-btn__pupil { background-color: var(--black); } .creepy-btn__cover, .creepy-btn__pupil { border-radius: inherit; display: block; } .creepy-btn__cover { background-color: var(--primary5); box-shadow: 0000.125emvar(--black) inset; padding: 0.5em1em; inset: 0; transform-origin: 1.25em50%; transition: background-color var(--trans-dur), transform var(--trans-dur) cubic-bezier(0.65, 0, 0.35, 1); } .creepy-btn__eye { animation: eye-blink 3s infinite; background-color: var(--gray1); border-radius: 50%; overflow: hidden; width: 0.75em; height: 0.75em; } .creepy-btn__eyes, .creepy-btn__pupil { position: absolute; } .creepy-btn__eyes { display: flex; align-items: center; gap: 0.375em; right: 1em; bottom: 0.5em; height: 0.75em; } .creepy-btn__pupil { aspect-ratio: 1; top: 50%; left: 50%; width: 0.375em; transform: translate(-50%, -50%); } .creepy-btn:focus-visible { outline: 0.1875em solid var(--primary3); } .creepy-btn:hover.creepy-btn__cover { background-color: var(--primary6); } .creepy-btn:focus-visible.creepy-btn__cover, .creepy-btn:hover.creepy-btn__cover { transform: rotate(-12deg); transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1.65); } .creepy-btn:active.creepy-btn__cover { transform: rotate(0); transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1); } @keyframes eye-blink { 0%, 92%, 100% { animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); height: 0.75em; } 96% { animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); height: 0; } }
-
-        </style>
-
-    </head>
-
-    <body>
-
-        <div id="root">
-
-        </div>
-
-        <script type="module">
-
-            import React, { StrictMode, useRef, useState } from"https://esm.sh/react";
-
-            import { createRoot } from"https://esm.sh/react-dom/client";
-
-            function CreepyButton({ onClick, children }) {
-
-            const eyesRef = useRef(null);
-
-            const [eyeCoords, setEyeCoords] = useState({ x: 0, y: 0 });
-
-            const translateX = `${-50 + eyeCoords.x * 50}%`;
-
-            const translateY = `${-50 + eyeCoords.y * 50}%`;
-
-            const eyeStyle = {
-
-            transform: `translate(${translateX}, ${translateY})`
-
-            };
-
-            const updateEyes = (e) => {
-
-            const userEvent = "touches"in e ? e.touches[0] : e;
-
-            const eyesRect = eyesRef.current?.getBoundingClientRect();
-
-            if (!eyesRect) return;
-
-            const eyes = {
-
-            x: eyesRect.left + eyesRect.width / 2,
-
-            y: eyesRect.top + eyesRect.height / 2
-
-            };
-
-            const cursor = {
-
-            x: userEvent.clientX,
-
-            y: userEvent.clientY
-
-            };
-
-            const dx = cursor.x - eyes.x;
-
-            const dy = cursor.y - eyes.y;
-
-            const angle = Math.atan2(-dy, dx) + Math.PI / 2;
-
-            const visionRangeX = 180;
-
-            const visionRangeY = 75;
-
-            const distance = Math.hypot(dx, dy);
-
-            const x = Math.sin(angle) * distance / visionRangeX;
-
-            const y = Math.cos(angle) * distance / visionRangeY;
-
-            setEyeCoords({ x, y });
-
-            };
-
-            return React.createElement(
-
-            "button",
-
-            {
-
-            className: "creepy-btn",
-
-            type: "button",
-
-            onClick,
-
-            onMouseMove: updateEyes,
-
-            onTouchMove: updateEyes
-
-            },
-
-            React.createElement(
-
-            "span",
-
-            { className: "creepy-btn__eyes", ref: eyesRef },
-
-            React.createElement(
-
-            "span",
-
-            { className: "creepy-btn__eye" },
-
-            React.createElement("span", {
-
-            className: "creepy-btn__pupil",
-
-            style: eyeStyle
-
-            })
-
-            ),
-
-            React.createElement(
-
-            "span",
-
-            { className: "creepy-btn__eye" },
-
-            React.createElement("span", {
-
-            className: "creepy-btn__pupil",
-
-            style: eyeStyle
-
-            })
-
-            )
-
-            ),
-
-            React.createElement("span", { className: "creepy-btn__cover" }, children)
-
-            );
-
-            }
-
-            createRoot(document.getElementById("root")).render(
-
-            React.createElement(
-
-            StrictMode,
-
-            null,
-
-            React.createElement(CreepyButton, null, "Button")
-
-            )
-
-            );
-
-        </script>
-
-    </body>
-
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一个按钮</title>
+
+<link rel="stylesheet" href="https://fonts.bunny.net/css?family=londrina-solid:400">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;border:0}
+:root{
+--hue:223deg;
+--gray1:hsl(var(--hue) 10% 95%);
+--gray9:hsl(var(--hue) 10% 15%);
+--black:hsl(0 0% 0%);
+--primary3:hsl(var(--hue) 90% 75%);
+--primary5:hsl(var(--hue) 90% 55%);
+--primary6:hsl(var(--hue) 90% 45%);
+--trans-dur:.3s;
+color-scheme:light dark;
+font-size:clamp(1.25rem,1rem + 1.25vw,2.5rem);
+}
+body,button{
+font:1em/1.5 "Londrina Solid",sans-serif;
+transition:background-color var(--trans-dur),color var(--trans-dur);
+}
+body{
+background:light-dark(var(--gray1),var(--gray9));
+color:light-dark(var(--gray9),var(--gray1));
+display:grid;
+place-items:center;
+height:100vh;
+}
+.creepy-btn{
+position:relative;
+background:var(--black);
+border-radius:1.25em;
+color:var(--gray1);
+cursor:pointer;
+letter-spacing:1px;
+min-width:9em;
+outline:.1875em solid transparent;
+transition:outline .1s linear;
+-webkit-tap-highlight-color:transparent;
+}
+.creepy-btn__cover,.creepy-btn__eye{position:relative}
+.creepy-btn__cover{
+display:block;
+background:var(--primary5);
+border-radius:inherit;
+padding:.5em 1em;
+box-shadow:0 0 0 .125em var(--black) inset;
+transform-origin:1.25em 50%;
+transition:background-color var(--trans-dur),transform var(--trans-dur) cubic-bezier(.65,0,.35,1);
+}
+.creepy-btn__eyes{
+position:absolute;
+display:flex;
+gap:.375em;
+align-items:center;
+right:1em;
+bottom:.5em;
+height:.75em;
+}
+.creepy-btn__eye{
+width:.75em;height:.75em;border-radius:50%;
+background:var(--gray1);
+overflow:hidden;
+animation:eye-blink 3s infinite;
+}
+.creepy-btn__pupil{
+position:absolute;
+top:50%;left:50%;
+width:.375em;aspect-ratio:1;
+border-radius:50%;
+background:#000;
+transform:translate(-50%,-50%);
+}
+.creepy-btn:hover .creepy-btn__cover{background:var(--primary6)}
+.creepy-btn:hover .creepy-btn__cover,
+.creepy-btn:focus-visible .creepy-btn__cover{
+transform:rotate(-12deg);
+transition-timing-function:cubic-bezier(.65,0,.35,1.65);
+}
+.creepy-btn:active .creepy-btn__cover{transform:rotate(0)}
+@keyframes eye-blink{
+0%,92%,100%{height:.75em}
+96%{height:0}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="module">
+import React,{StrictMode,useRef,useState} from "https://esm.sh/react";
+import {createRoot} from "https://esm.sh/react-dom/client";
+
+function CreepyButton({children,onClick}){
+ const eyesRef=useRef(null);
+ const [eye,setEye]=useState({x:0,y:0});
+
+ function update(e){
+   const p=("touches" in e)?e.touches[0]:e;
+   const r=eyesRef.current?.getBoundingClientRect();
+   if(!r)return;
+   const cx=r.left+r.width/2, cy=r.top+r.height/2;
+   const dx=p.clientX-cx, dy=p.clientY-cy;
+   const angle=Math.atan2(-dy,dx)+Math.PI/2;
+   const dist=Math.hypot(dx,dy);
+   const clamp=v=>Math.max(-1,Math.min(1,v));
+   setEye({
+      x:clamp(Math.sin(angle)*dist/180),
+      y:clamp(Math.cos(angle)*dist/75)
+   });
+ }
+
+ const style={
+   transform:`translate(${-50+eye.x*50}%,${-50+eye.y*50}%)`
+ };
+
+ return React.createElement(
+   "button",
+   {
+     className:"creepy-btn",
+     onClick,
+     onMouseMove:update,
+     onTouchMove:update,
+     onMouseLeave:()=>setEye({x:0,y:0})
+   },
+   React.createElement("span",{className:"creepy-btn__eyes",ref:eyesRef},
+     React.createElement("span",{className:"creepy-btn__eye"},
+       React.createElement("span",{className:"creepy-btn__pupil",style})
+     ),
+     React.createElement("span",{className:"creepy-btn__eye"},
+       React.createElement("span",{className:"creepy-btn__pupil",style})
+     )
+   ),
+   React.createElement("span",{className:"creepy-btn__cover"},children)
+ );
+}
+
+createRoot(document.getElementById("root")).render(
+React.createElement(StrictMode,null,
+React.createElement(CreepyButton,null,"按下去"))
+);
+</script>
+</body>
 </html>
